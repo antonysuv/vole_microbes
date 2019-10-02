@@ -3,11 +3,18 @@ library('runjags')
 
 
 
+
+# Nsample = number of samples (i.e. OTU rows)
+# Notu = number of OTUs (i.e. OTU columns)
+# regions = numerical vector corresponding to region assignments 
+# a,b,d = regression parameters
+
 rjags.model="
 model
 {
     for (i in 1:Nsample)
     {
+
         y[i,1:Notu] ~ dmulti(p[regions[i],1:Notu],K[i])
         
     }
