@@ -2,7 +2,24 @@ library('rjags')
 library('runjags')
 
 
+load("micro_matrix_for_anton_Oct2.RData")
+y=rbind(y.genus.n,y.genus.cs,y.genus.s)
+K=apply(y,1,sum)
+Nsample=nrow(y)
+Notu=ncol(y)
+regions=c(ifelse(meta.n$mtDNA=="N",1,0),ifelse(meta.cs$mtDNA=="N",2,3),ifelse(meta.s$mtDNA=="S",4,0))
+Nregion=length(unique(regions))
 
+clim=c(meta.n$ClimPC1,meta.cs$ClimPC1,meta.s$ClimPC1)
+clim_norm=(clim-mean(clim))/sd(clim)
+clim_mu=as.vector(tapply(clim_norm,regions,mean))
+clim_sigma=as.vector(tapply(clim_norm,regions,sd))
+
+v_fac=rep(c(1,2,3),times=c(length(n.dist.vec),length(cs.dist.vec),length((s.dist.vec))))
+d=c(n.dist.vec,cs.dist.vec,s.dist.vec)
+d_norm=(d-mean(d))/sd(d)
+d_mu=as.vector(tapply(d_norm,v_fac,mean))
+d_sigma=as.vector(tapply(d_norm,v_fac,sd))
 
 # Nsample = number of samples (i.e. OTU rows)
 # Notu = number of OTUs (i.e. OTU columns)
@@ -21,9 +38,9 @@ model
     for (r in 1:Nregion)
     {
         p[r,1:Notu] ~ ddirch(alpha[r,1:Notu])
-        a[r] ~ dnorm(0,3)
-        b[r] ~ dnorm(0,3)
-        d[r] ~ dnorm(0,3) 
+        a[r] ~ dnorm(0,5)
+        b[r] ~ dnorm(0,5)
+        d[r] ~ dnorm(0,5) 
         climate[r]~dnorm(mu_climate[r],sigma_climate[r])
         distance[r]~dnorm(mu_distance[r],sigma_distance[r])
         for (otu_index in 1:Notu)
@@ -33,13 +50,19 @@ model
 
     } 
    
-    mu_climate=c(1,2,3)
-    sigma_climate=c(1,2,10)
-    mu_distance=c(1,2,3)
-    sigma_distance=c(1,2,10)
+    mu_climate=c(-1.2191640,0.8361488,0.7075440,0.4595694)
+    sigma_climate=c(0.4465319,0.3590162,0.4321223,0.6069088)
+    mu_distance=c(0.02421556,0.54637980,0.54637980,-0.77520118)
+    sigma_distance=c(0.2995745,1.2992233,1.2992233,0.3495740)
     err ~ dnorm(0,3)
 }
 " 
+
+
+
+
+
+mydata=list(y=y,K=K,Nsample=Nsample,Notu=Notu,regions=regions,Nregion=Nregion)
 
 
 
