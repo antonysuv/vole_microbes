@@ -10,12 +10,18 @@ Notu=ncol(y)
 regions=c(ifelse(meta.n$mtDNA=="N",1,0),ifelse(meta.cs$mtDNA=="N",2,3),ifelse(meta.s$mtDNA=="S",4,0))
 Nregion=length(unique(regions))
 
+#Climate data prep
 clim=c(meta.n$ClimPC1,meta.cs$ClimPC1,meta.s$ClimPC1)
+#Normalization of climate
 clim_norm=(clim-mean(clim))/sd(clim)
+#Mu for empirical Bayes prior constraction  
 clim_mu=as.vector(tapply(clim_norm,regions,mean))
+#Sigma for empirical Bayes prior constraction
 clim_sigma=as.vector(tapply(clim_norm,regions,sd))
-
+#Pointer for regions
 v_fac=rep(c(1,2,3),times=c(length(n.dist.vec),length(cs.dist.vec),length((s.dist.vec))))
+
+#Genetic distance data prep
 d=c(n.dist.vec,cs.dist.vec,s.dist.vec)
 d_norm=(d-mean(d))/sd(d)
 d_mu=as.vector(tapply(d_norm,v_fac,mean))
@@ -60,13 +66,20 @@ model
 
 
 
-
-
 mydata=list(y=y,K=K,Nsample=Nsample,Notu=Notu,regions=regions,Nregion=Nregion)
 
 
+fit=run.jags(
+                model = rjags.model,
+                data = mydata,
+                n.chains = 1,
+                adapt =   500,
+                burnin = 10,
+                sample =  200,
+                monitor = c('p','alpha','a','b','d') 
+            )
 
-
+#Test simulation
 mydata=list(
                 y=t(cbind(rmultinom(10,size=rpois(10,100),prob=c(0.15,0.1,0.7,0.05)),
                     rmultinom(10,size=rpois(10,100),prob=c(0.1,0.1,0.1,0.7)),
@@ -78,14 +91,3 @@ mydata=list(
                 Nregion=length(unique(regions))
                 #mtdna=sample(c(1,2),size=30,replace=T),
                 #Nmtdna=length(unique(mtdna))
-            )
-
-fit=run.jags(
-                model = rjags.model,
-                data = mydata,
-                n.chains = 3,
-                adapt =   500,
-                burnin = 300,
-                sample =  20000,
-                monitor = c('p','alpha','a','b') 
-            )
