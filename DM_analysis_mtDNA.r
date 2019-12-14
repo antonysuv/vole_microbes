@@ -1,9 +1,10 @@
+#!/usr/bin/env Rscript
 library('rjags')
-library('runjags')
+library('runjags') 
 
 
 load("micro_matrix_for_anton_Oct2.RData")
-y=rbind(y.genus.n,y.genus.cs,y.genus.s)
+y=rbind(y.n,y.cs,y.s)
 K=apply(y,1,sum)
 Nsample=nrow(y)
 Notu=ncol(y)
@@ -72,22 +73,10 @@ mydata=list(y=y,K=K,Nsample=Nsample,Notu=Notu,regions=regions,Nregion=Nregion)
 fit=run.jags(
                 model = rjags.model,
                 data = mydata,
-                n.chains = 1,
+                n.chains = 3,
                 adapt =   500,
-                burnin = 10,
-                sample =  200,
+                burnin = 1000,
+                sample =  1000000,
                 monitor = c('p','alpha','a','b','d') 
             )
-
-#Test simulation
-mydata=list(
-                y=t(cbind(rmultinom(10,size=rpois(10,100),prob=c(0.15,0.1,0.7,0.05)),
-                    rmultinom(10,size=rpois(10,100),prob=c(0.1,0.1,0.1,0.7)),
-                    rmultinom(10,size=rpois(10,100),prob=c(0.6,0.3,0.05,0.05)))),
-                K=apply(y,1,sum),
-                Nsample=nrow(y),
-                Notu=ncol(y),
-                regions=rep(c(1,2,3),each=10),
-                Nregion=length(unique(regions))
-                #mtdna=sample(c(1,2),size=30,replace=T),
-                #Nmtdna=length(unique(mtdna))
+save(fit, file = "MCMC_mtDNA.RData")
