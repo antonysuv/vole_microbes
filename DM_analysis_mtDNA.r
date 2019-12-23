@@ -83,45 +83,5 @@ fit=run.jags(
 save(fit, file = "MCMC_mtDNA.RData")
 
 
-sample(K,size=1)
 
-all=rbind(as.data.frame(fit$mcmc[[1]][1:100,]),as.data.frame(fit$mcmc[[2]][1:100,]),as.data.frame(fit$mcmc[[3]][1:100,]))
-reg1N=all[,seq(1,1237,4)]
-reg2NC=all[,seq(2,1238,4)]
-reg3SC=all[,seq(3,1239,4)]
-reg4S=all[,seq(4,1240,4)] 
-
-
-reg1N=all[,seq(3721,4957,4)]
-reg2NC=all[,seq(3722,4958,4)]
-reg3SC=all[,seq(3723,4959,4)]
-reg4S=all[,seq(3724,4960,4)] 
-
-reg1N=all[,seq(4961,6197,4)]
-reg2NC=all[,seq(4962,6198,4)]
-reg3SC=all[,seq(4963,6199,4)]
-reg4S=all[,seq(4964,6200,4)] 
-
-
-reg1N=all[,seq(2877,3717,4)]
-reg2NC=all[,seq(2878,3718,4)]
-reg3SC=all[,seq(2879,3719,4)]
-reg4S=all[,seq(2880,3720,4)] 
-
-
-
-all_postpred=c()
-for (i in 1:1000)
-{
-    zran=sample(K,1)
-    r1=t(rmultinom(1,zran,reg1N[1,]))
-    zran=sample(K,1)
-    r2=t(rmultinom(1,zran,reg1N[1,]))
-    zran=sample(K,1)
-    r3=t(rmultinom(1,zran,reg1N[1,]))
-    zran=sample(K,1)
-    r4=t(rmultinom(1,zran,reg1N[1,]))
-    all_postpred=rbind(all_postpred,r1,r2,r3,r4)
-}    
-co=rep(c(1,2,3,4),times=1000)    
           
