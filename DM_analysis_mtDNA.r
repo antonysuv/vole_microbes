@@ -75,9 +75,9 @@ fit=run.jags(
                 model = rjags.model,
                 data = mydata,
                 n.chains = 1,
-                adapt =   50,
-                burnin = 50,
-                sample =  500,
+                adapt =   500,
+                burnin = 1000,
+                sample =  10000,
                 monitor = c('p','alpha','a','b','d') 
             )
 save(fit, file = "MCMC_mtDNA.RData")

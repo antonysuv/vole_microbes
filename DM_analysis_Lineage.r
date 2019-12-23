@@ -45,18 +45,18 @@ model
     for (r in 1:Nregion)
     {
         p[r,1:Notu] ~ ddirch(alpha[r,1:Notu])
-        a[r] ~ dnorm(0,5)
-        b[r] ~ dnorm(0,5)
-        d[r] ~ dnorm(0,5) 
-        climate[r]~dnorm(mu_climate[r],sigma_climate[r])
-        distance[r]~dnorm(mu_distance[r],sigma_distance[r])
         for (otu_index in 1:Notu)
-        { 
-           alpha[r,otu_index] = exp(a[r]+b[r]*climate[r]+d[r]*distance[r]+err) 
-        }    
+        {
+            alpha[r,otu_index] = exp(a[r,otu_index]+b[r,otu_index]*climate[r,otu_index]+d[r,otu_index]*distance[r,otu_index]+err)+0.01
+            a[r,otu_index] ~ dnorm(0,5)
+            b[r,otu_index] ~ dnorm(0,5)
+            d[r,otu_index] ~ dnorm(0,5) 
+            climate[r,otu_index]~dnorm(mu_climate[r],sigma_climate[r])
+            distance[r,otu_index]~dnorm(mu_distance[r],sigma_distance[r])
+            
+        }
 
     } 
-   
     mu_climate=c(-1.2191640,0.6317949,1.1426795,0.5372736,0.4595694)
     sigma_climate=c(0.4465319,0.3266884,0.000001,0.3941457,0.6069088)
     mu_distance=c(0.02421556,0.54637980,0.54637980,0.54637980,-0.77520118)
@@ -76,7 +76,7 @@ fit=run.jags(
                 n.chains = 3,
                 adapt =   500,
                 burnin = 1000,
-                sample =  1000000,
+                sample =  10000,
                 monitor = c('p','alpha','a','b','d') 
             )
 

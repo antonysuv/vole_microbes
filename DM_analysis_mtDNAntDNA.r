@@ -49,15 +49,16 @@ model
     for (r in 1:Nregion)
     {
         p[r,1:Notu] ~ ddirch(alpha[r,1:Notu])
-        a[r] ~ dnorm(0,5)
-        b[r] ~ dnorm(0,5)
-        d[r] ~ dnorm(0,5) 
-        climate[r]~dnorm(mu_climate[r],sigma_climate[r])
-        distance[r]~dnorm(mu_distance[r],sigma_distance[r])
         for (otu_index in 1:Notu)
-        { 
-           alpha[r,otu_index] = exp(a[r]+b[r]*climate[r]+d[r]*distance[r]+err) 
-        }    
+        {
+            alpha[r,otu_index] = exp(a[r,otu_index]+b[r,otu_index]*climate[r,otu_index]+d[r,otu_index]*distance[r,otu_index]+err)+0.01
+            a[r,otu_index] ~ dnorm(0,5)
+            b[r,otu_index] ~ dnorm(0,5)
+            d[r,otu_index] ~ dnorm(0,5) 
+            climate[r,otu_index]~dnorm(mu_climate[r],sigma_climate[r])
+            distance[r,otu_index]~dnorm(mu_distance[r],sigma_distance[r])
+            
+        }
 
     } 
    
@@ -80,7 +81,7 @@ fit=run.jags(
                 n.chains = 3,
                 adapt =   500,
                 burnin = 1000,
-                sample =  1000000,
+                sample =  10000,
                 monitor = c('p','alpha','a','b','d') 
             )
 save(fit, file = "MCMC_mtDNAntDNA.RData")
