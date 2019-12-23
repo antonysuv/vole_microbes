@@ -45,15 +45,16 @@ model
     for (r in 1:Nregion)
     {
         p[r,1:Notu] ~ ddirch(alpha[r,1:Notu])
-        a[r] ~ dnorm(0,5)
-        b[r] ~ dnorm(0,5)
-        d[r] ~ dnorm(0,5) 
-        climate[r]~dnorm(mu_climate[r],sigma_climate[r])
-        distance[r]~dnorm(mu_distance[r],sigma_distance[r])
         for (otu_index in 1:Notu)
-        { 
-           alpha[r,otu_index] = exp(a[r]+b[r]*climate[r]+d[r]*distance[r]+err) 
-        }    
+        {
+            alpha[r,otu_index] = exp(a[r,otu_index]+b[r,otu_index]*climate[r,otu_index]+d[r,otu_index]*distance[r,otu_index]+err)+0.01
+            a[r,otu_index] ~ dnorm(0,5)
+            b[r,otu_index] ~ dnorm(0,5)
+            d[r,otu_index] ~ dnorm(0,5) 
+            climate[r,otu_index]~dnorm(mu_climate[r],sigma_climate[r])
+            distance[r,otu_index]~dnorm(mu_distance[r],sigma_distance[r])
+            
+        }
 
     } 
    
@@ -73,10 +74,54 @@ mydata=list(y=y,K=K,Nsample=Nsample,Notu=Notu,regions=regions,Nregion=Nregion)
 fit=run.jags(
                 model = rjags.model,
                 data = mydata,
-                n.chains = 3,
-                adapt =   500,
-                burnin = 1000,
-                sample =  1000000,
+                n.chains = 1,
+                adapt =   50,
+                burnin = 50,
+                sample =  500,
                 monitor = c('p','alpha','a','b','d') 
             )
 save(fit, file = "MCMC_mtDNA.RData")
+
+
+sample(K,size=1)
+
+all=rbind(as.data.frame(fit$mcmc[[1]][1:100,]),as.data.frame(fit$mcmc[[2]][1:100,]),as.data.frame(fit$mcmc[[3]][1:100,]))
+reg1N=all[,seq(1,1237,4)]
+reg2NC=all[,seq(2,1238,4)]
+reg3SC=all[,seq(3,1239,4)]
+reg4S=all[,seq(4,1240,4)] 
+
+
+reg1N=all[,seq(3721,4957,4)]
+reg2NC=all[,seq(3722,4958,4)]
+reg3SC=all[,seq(3723,4959,4)]
+reg4S=all[,seq(3724,4960,4)] 
+
+reg1N=all[,seq(4961,6197,4)]
+reg2NC=all[,seq(4962,6198,4)]
+reg3SC=all[,seq(4963,6199,4)]
+reg4S=all[,seq(4964,6200,4)] 
+
+
+reg1N=all[,seq(2877,3717,4)]
+reg2NC=all[,seq(2878,3718,4)]
+reg3SC=all[,seq(2879,3719,4)]
+reg4S=all[,seq(2880,3720,4)] 
+
+
+
+all_postpred=c()
+for (i in 1:1000)
+{
+    zran=sample(K,1)
+    r1=t(rmultinom(1,zran,reg1N[1,]))
+    zran=sample(K,1)
+    r2=t(rmultinom(1,zran,reg1N[1,]))
+    zran=sample(K,1)
+    r3=t(rmultinom(1,zran,reg1N[1,]))
+    zran=sample(K,1)
+    r4=t(rmultinom(1,zran,reg1N[1,]))
+    all_postpred=rbind(all_postpred,r1,r2,r3,r4)
+}    
+co=rep(c(1,2,3,4),times=1000)    
+          
