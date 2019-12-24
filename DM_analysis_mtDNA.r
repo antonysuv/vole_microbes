@@ -74,7 +74,7 @@ mydata=list(y=y,K=K,Nsample=Nsample,Notu=Notu,regions=regions,Nregion=Nregion)
 fit=run.jags(
                 model = rjags.model,
                 data = mydata,
-                n.chains = 1,
+                n.chains = 3,
                 adapt =   500,
                 burnin = 1000,
                 sample =  10000,
