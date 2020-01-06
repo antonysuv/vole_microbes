@@ -12,7 +12,7 @@ n_mtnuc=as.vector(apply(meta.n[ ,c("mtDNA","Nuclear")],1,paste,collapse=""))
 ns_mtnuc=as.vector(apply(meta.cs[ ,c("mtDNA","Nuclear")],1,paste,collapse=""))
 s_mtnuc=as.vector(apply(meta.s[ ,c("mtDNA","Nuclear")],1,paste,collapse=""))
 
-regions=c(ifelse(n_mtnuc=="NN",1),ifelse(ns_mtnuc=="NN",2,ifelse(ns_mtnuc=="NS",3,ifelse(ns_mtnuc=="Shybrid",4,ifelse(ns_mtnuc=="SN",5,ifelse(ns_mtnuc=="SS",6,0))))),ifelse(s_mtnuc=="SS",7))
+regions=c(ifelse(n_mtnuc=="NN",1),ifelse(ns_mtnuc=="NN",2,ifelse(ns_mtnuc=="NS",3,ifelse(ns_mtnuc=="Shybrid",4,ifelse(ns_mtnuc=="SN",4,ifelse(ns_mtnuc=="SS",5,0))))),ifelse(s_mtnuc=="SS",6))
 Nregion=length(unique(regions))
 
 #Climate data prep
@@ -51,7 +51,7 @@ model
         p[r,1:Notu] ~ ddirch(alpha[r,1:Notu])
         for (otu_index in 1:Notu)
         {
-            alpha[r,otu_index] = exp(a[r,otu_index]+b[r,otu_index]*climate[r,otu_index]+d[r,otu_index]*distance[r,otu_index]+err)+0.1
+            alpha[r,otu_index] = exp(a[r,otu_index]+b[r,otu_index]*climate[r,otu_index]+d[r,otu_index]*distance[r,otu_index]+err)+0.01
             a[r,otu_index] ~ dnorm(0,5)
             b[r,otu_index] ~ dnorm(0,5)
             d[r,otu_index] ~ dnorm(0,5) 
@@ -62,10 +62,10 @@ model
 
     } 
    
-    mu_climate=c(-1.2191640,0.6317949,1.1426795,0.8426714,0.3857724,1.1426795,0.4595694)
-    sigma_climate=c(0.4465319,0.3266884,0.00001,0.00001,0.2915717,0.00001,0.6069088)
-    mu_distance=c(0.02421556,0.54637980,0.54637980,0.54637980,0.54637980,0.54637980,-0.77520118)
-    sigma_distance=c(0.2995745,1.2992233,1.2992233,1.2992233,1.2992233,1.2992233,0.3495740)
+    mu_climate=c(-1.2191640,0.6317949,1.1426795,0.4098197,1.1426795,0.4595694)
+    sigma_climate=c(0.4465319,0.3266884,0.0000001,0.3021229,0.0000001,0.6069088)
+    mu_distance=c(0.02421556,0.54637980,0.54637980,0.54637980,0.54637980,-0.77520118)
+    sigma_distance=c(0.2995745,1.2992233,1.2992233,1.2992233,1.2992233,0.3495740)
     err ~ dnorm(0,3)
 }
 " 
